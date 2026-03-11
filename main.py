@@ -2,6 +2,7 @@ import urllib.request
 import json
 import sys
 import urllib.error
+from collections import Counter
 
 
 if len(sys.argv) < 2:
@@ -22,18 +23,26 @@ except (urllib.error.HTTPError, urllib.error.URLError) as e:
     sys.exit(1)
 
 events: dict[str, str] = {
-    "PushEvent" : "Pushed to ",
+    "PushEvent" : "Pushed ",
     "IssuesEvent" : "Created new issue on ",
     "IssueCommentEvent" : "Commented on ",
     "WatchEvent" : "Starred ",
     "ForkEvent" : "Forked ",
-    "CreateEvent" : "Created event as ",
+    "CreateEvent" : "Created an event as ",
     "DeleteEvent" : "Deleted ",
-    "PullRequestEvent" : "Created pull request ",
+    "PullRequestEvent" : "Created a pull request on ",
     "PublicEvent" : "Published ",
     }
 
-for d in data[:4]:
-    print(f"{events.get(d['type'], 'No event found for ')}{d['repo']['name']}")
+counter: Counter = Counter((d['type'], d['repo']['name']) for d in data[:8])
 
-print(data[0]["payload"])
+for (type, reponame), count in counter.items():
+    if type == "PushEvent" and count > 1:
+        event_commands: str = f"Pushed {count} commits to {reponame}"
+    else:
+        event_commands: str = f"{events.get(type, 'No event found for ')}{reponame}"
+    print(event_commands)
+
+
+
+# python3 main.py kamranahmedse
