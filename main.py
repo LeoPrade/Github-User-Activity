@@ -42,7 +42,3 @@ for (type, reponame), count in counter.items():
     else:
         event_commands: str = f"{events.get(type, 'No event found for ')}{reponame}"
     print(event_commands)
-
-
-
-# python3 main.py kamranahmedse
